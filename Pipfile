@@ -9,6 +9,8 @@ verify_ssl = true
 flask = "*"
 flask-sqlalchemy = "*"
 flask-login = "*"
+flask-wtf = "*"
+werkzeug = "*"
 
 [requires]
 python_version = "3.7"
