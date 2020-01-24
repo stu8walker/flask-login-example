@@ -1,7 +1,7 @@
-from flask import Flask, render_template, redirect, url_for
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField
-from wtforms.validators import InputRequired, Email, Length
+from flask import Flask, render_template, redirect, url_for, request, flash
+from flask_wtf import FlaskForm, CSRFProtect
+from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms.validators import InputRequired, Email, Length, EqualTo
 from flask_sqlalchemy  import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -12,6 +12,10 @@ app = Flask(__name__)
 
 # Set the secret key
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+
+# csrf glabally
+csrf = CSRFProtect(app)
+csrf.init_app(app)
 
 # Database
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -39,7 +43,14 @@ class User(UserMixin, db.Model):
 
 
 # Forms
-
+class RegisterForm(FlaskForm):
+    first_name = StringField('First name', validators=[InputRequired(), Length(min=4, max=20)])
+    surname = StringField('Surname', validators=[InputRequired(), Length(min=4, max=20)])
+    email = StringField('Email', validators=[InputRequired(), Email(message='Invalid email'), Length(max=50)])
+    password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=80)])
+    password2 = PasswordField('Repeat Password', validators=[InputRequired(), 
+        EqualTo('password', message="Passwords must match"), Length(min=8, max=80)])
+    submit = SubmitField('Register')
 
 
 # Routes
@@ -53,7 +64,11 @@ def login():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    return render_template('register.html')
+    form = RegisterForm()
+    if form.validate_on_submit():
+        flash('Success!')
+        return redirect(url_for('index'))
+    return render_template('register.html', form=form)
 
 @app.route('/dashboard', methods=['GET'])
 @login_required

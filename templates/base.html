@@ -43,6 +43,16 @@
         </nav>
         </br> </br> </br>
 
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                    <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
         <!-- Template content block-->
         {% block content %}{% endblock %}
 

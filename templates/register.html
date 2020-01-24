@@ -2,7 +2,7 @@
 
 {% block content %}
 
-    <main role="main" class="container">
+      <main role="main" class="container">
         <div class="row justify-content-center"">
           <div class="col-sm"></div>
           <div class="col-sm">
@@ -11,7 +11,57 @@
           <div class="col-sm"></div>
         </div>
 
+        <!--<p class="lead">This example is a quick exercise to illustrate how fixed to top navbar works. As you scroll, it will remain fixed to the top of your browser's viewport.</p>
+        <a class="btn btn-lg btn-primary" href="https://getbootstrap.com/docs/4.0/components/navbar/" role="button">View navbar docs »</a> -->
+
       <br>
+
+      <div class="row row justify-content-center">
+        <div class="col-sm">
+        </div>
+        <div class="col-sm">
+
+            <form class="form-signin" action="" method="POST">
+            <div class="form-group">
+                {{ form.csrf_token }}
+                
+                {{ form.first_name(class="form-control form-control", placeholder="First name")  }}
+                {% for error in form.first_name.errors %}
+                    <span style="color: red;">{{ error }}</span>
+                {% endfor %}
+                <br>
+                {{ form.surname(class="form-control form-control", placeholder="Surname") }}
+                {% for error in form.surname.errors %}
+                    <span style="color: red;">{{ error }}</span>
+                {% endfor %}
+                <br>
+                {{ form.email(class="form-control form-control", placeholder="Email")  }}
+                {% for error in form.email.errors %}
+                    <span style="color: red;">{{ error }}</span>
+                {% endfor %}
+                <br>
+                {{ form.password(class="form-control form-control", placeholder="Password") }}
+                {% for error in form.password.errors %}
+                    <span style="color: red;">{{ error }}</span>
+                {% endfor %}
+                <br>
+                {{ form.password2(class="form-control form-control", placeholder="Repeat password") }}
+                {% for error in form.password2.errors %}
+                    <span style="color: red;">{{ error }}</span>
+                {% endfor %}
+                <br>
+                {{ form.submit(class="btn btn btn-primary") }}
+
+            </div>
+            </form>
+
+        </div>
+        <div class="col-sm">
+        </div>
+      </div>
+    </main>
+
+
 
     </main>
 
