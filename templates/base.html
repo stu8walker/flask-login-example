@@ -32,12 +32,16 @@
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
-                    <a class="nav-link" href="/">Index <span class="sr-only">(current)</span></a>
                 </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                <li><a class="nav-link" href="/register">Register<span class="sr-only">(current)</span></a></li>
-                <li><a class="nav-link" href="/login">Login<span class="sr-only">(current)</span></a></li>
+                {% if not current_user.is_authenticated %}
+                    <li><a class="nav-link" href="{{ url_for('register') }}">Register<span class="sr-only">(current)</span></a></li>
+                    <li><a class="nav-link" href="{{ url_for('login') }}">Login<span class="sr-only">(current)</span></a></li>
+                {% else %}
+                    <li><a class="nav-link" href="{{ url_for('logout') }}">Logout<span class="sr-only">(current)</span></a></li>
+                {% endif %}
+
                 </ul>
             </div>
         </nav>
