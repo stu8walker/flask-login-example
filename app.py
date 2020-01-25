@@ -13,7 +13,7 @@ app = Flask(__name__)
 # Set the secret key
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
-# csrf glabally
+# CSRF enabled globally
 csrf = CSRFProtect(app)
 csrf.init_app(app)
 
@@ -66,8 +66,13 @@ def login():
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
-        flash('Success!')
-        return redirect(url_for('index'))
+        hashed_password = generate_password_hash(form.password.data, method='sha256')
+        new_user = User(first_name = form.first_name.data, surname = form.surname.data, 
+                        email = form.email.data, password = hashed_password)
+        db.session.add(new_user)
+        db.session.commit()
+        flash('Your new account has been created! Time to login.', 'success')
+        return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
 @app.route('/dashboard', methods=['GET'])
