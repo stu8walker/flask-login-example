@@ -5,7 +5,9 @@ from wtforms.validators import InputRequired, Email, Length, EqualTo, DataRequir
 from flask_sqlalchemy  import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.urls import url_parse
 import os
+
 
 # 
 app = Flask(__name__)
@@ -64,20 +66,25 @@ class LoginForm(FlaskForm):
 def index():
     return render_template('index.html')
 
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email = form.email.data).first()
-        if user:
-            if check_password_hash(user.password, form.password.data):
-                login_user(user, remember=form.remember.data)
-                return redirect(url_for('dashboard'))
+        if user is None or not check_password_hash(user.password, form.password.data):
             flash('Email or password incorrect.', 'danger')
-        flash('Email or password incorrect.', 'danger')
+            return redirect(url_for('login'))
+        login_user(user, remember=form.remember.data)
+        next_page = request.args.get('next')
+        
+        # Should check if the url is safe for redirects.
+        # Any argument not for site should eb redirected
+        # e.g. 127.0.0.1:5000/login?next=http://some-malicious-site.com
+        
+        if not next_page or url_parse(next_page).netloc != '':
+            next_page = url_for('dashboard')
+        return redirect(next_page)
     return render_template('login.html', form=form)
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -92,13 +99,11 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
-
 @app.route('/dashboard', methods=['GET'])
 @login_required
 def dashboard():
     user = current_user.first_name
     return render_template('dashboard.html', user=user)
-
 
 @app.route('/logout', methods=['GET'])
 def logout():
