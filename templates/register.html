@@ -37,7 +37,7 @@
                   <br>
                   {{ form.password(class="form-control form-control", placeholder="Password") }}
                   {% for error in form.password.errors %}
-                    <div class="alert alert-danger" role="alert">{{ error }}</div>n>
+                    <div class="alert alert-danger" role="alert">{{ error }}</div>
                   {% endfor %}
                   <br>
                   {{ form.password2(class="form-control form-control", placeholder="Repeat password") }}
@@ -46,9 +46,9 @@
                   {% endfor %}
                   <br>
                   {{ form.submit(class="btn btn btn-primary") }}
-
               </div>
             </form>
+            <a href="{{ url_for('login') }}">Already have an account? Log in here</a>
         </div>
         <div class="col-sm"></div>
       </div>
