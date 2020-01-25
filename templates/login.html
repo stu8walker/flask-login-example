@@ -10,16 +10,13 @@
     </div>
     <div class="col-sm"></div>
   </div>
-
 <br>
-
 <div class="row row justify-content-center">
   <div class="col-sm"></div>
   <div class="col-sm">
       <form class="form-signin" action="" method="POST">
         <div class="form-group">
             {{ form.csrf_token }}
-            
             {{ form.email(class="form-control form-control", placeholder="Email")  }}
             {% for error in form.email.errors %}
               <div class="alert alert-danger" role="alert">{{ error }}</div>
@@ -33,7 +30,6 @@
             {{ form.remember }} Remember me
             <br><br>
             {{ form.submit(class="btn btn btn-primary") }}
-
         </div>
       </form>
   </div>
