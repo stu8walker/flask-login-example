@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_wtf import FlaskForm, CSRFProtect
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
-from wtforms.validators import InputRequired, Email, Length, EqualTo
+from wtforms.validators import InputRequired, Email, Length, EqualTo, DataRequired
 from flask_sqlalchemy  import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -51,6 +51,12 @@ class RegisterForm(FlaskForm):
     password2 = PasswordField('Repeat Password', validators=[InputRequired(), 
         EqualTo('password', message="Passwords must match"), Length(min=8, max=80)])
     submit = SubmitField('Register')
+    
+class LoginForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    remember = BooleanField('Remember Me')
+    submit = SubmitField('Login')
 
 
 # Routes
@@ -58,9 +64,20 @@ class RegisterForm(FlaskForm):
 def index():
     return render_template('index.html')
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    return render_template('login.html')
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email = form.email.data).first()
+        if user:
+            if check_password_hash(user.password, form.password.data):
+                login_user(user, remember=form.remember.data)
+                return redirect(url_for('dashboard'))
+            flash('Email or password incorrect.', 'danger')
+        flash('Email or password incorrect.', 'danger')
+    return render_template('login.html', form=form)
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -75,10 +92,13 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
+
 @app.route('/dashboard', methods=['GET'])
 @login_required
 def dashboard():
-    return "Hello " + current_user.firstname
+    user = current_user.first_name
+    return render_template('dashboard.html', user=user)
+
 
 @app.route('/logout', methods=['GET'])
 def logout():
