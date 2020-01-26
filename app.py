@@ -9,7 +9,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.urls import url_parse
 import os, datetime
 
-
 # Initialise Flask
 app = Flask(__name__)
 
@@ -32,7 +31,6 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-
 # Models
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -47,7 +45,6 @@ class User(UserMixin, db.Model):
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
-
 
 # Forms
 class RegisterForm(FlaskForm):
@@ -71,7 +68,6 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[InputRequired(message="Please enter your password")])
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
-
 
 # Routes
 @app.route('/', methods=['GET'])
@@ -103,13 +99,17 @@ def register():
     form = RegisterForm()
     if form.validate_on_submit():
         hashed_password = generate_password_hash(form.password.data, method='sha256')
-        new_user = User(first_name = form.first_name.data, surname = form.surname.data, 
-                        email = form.email.data, password = hashed_password, 
-                        registered_date=datetime.datetime.now(), email_confirmed=False)
-        db.session.add(new_user)
-        db.session.commit()
-        flash('Your new account has been created! Time to login.', 'success')
-        return redirect(url_for('login'))
+        # Check if email address is already registered
+        if not User.query.filter_by(email = form.email.data).first():
+            new_user = User(first_name = form.first_name.data, surname = form.surname.data, 
+                            email = form.email.data, password = hashed_password, 
+                            registered_date=datetime.datetime.now(), email_confirmed=False)                   
+            db.session.add(new_user)
+            db.session.commit()
+            flash('Your new account has been created! Time to login.', 'success')
+            return redirect(url_for('login'))
+        flash('Email address is already registered with an account.', 'danger')
+        return redirect(url_for('register'))
     return render_template('register.html', form=form)
 
 @app.route('/dashboard', methods=['GET'])
@@ -122,7 +122,6 @@ def dashboard():
 def logout():
     logout_user()
     return redirect(url_for('index'))
-
 
 # Run app
 if __name__ == '__main__':
